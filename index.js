@@ -1,8 +1,8 @@
 var Keystone = require('./lib/keystone');
 var Glance = require('./lib/glance');
 var Neutron = require('./lib/neutron');
+var Octavia = require('./lib/octavia');
 var Nova = require('./lib/nova');
-var errors = require('./lib/os-errors');
 
 //A convenience method for quick/dirty work for those that already have a project_id
 //calls back with (error, project) where project already has all the individual objects setup
@@ -14,6 +14,7 @@ function getSimpleProject(username, password, project_id, keystone_url, cb)
   var glance_url = '';
   var neutron_url = '';
   var nova_url = '';
+  var octavia_url = '';
   var catalog_array = [];
   var n = 0;
   var j = 0;
@@ -68,6 +69,10 @@ function getSimpleProject(username, password, project_id, keystone_url, cb)
             {
               nova_url = endpoints_array[j].url;
             }
+            else if (endpoint_type == 'load-balancer')
+            {
+              octavia_url = endpoints_array[j].url;
+            }
             break;
           }
         }
@@ -78,20 +83,10 @@ function getSimpleProject(username, password, project_id, keystone_url, cb)
       return_object.glance = new Glance(glance_url, project_token.token);
       return_object.neutron = new Neutron(neutron_url, project_token.token);
       return_object.nova = new Nova(nova_url, project_token.token);
+      return_object.octavia = new Octavia(octavia_url, project_token.token);
       cb(null, return_object);
     });
   });
-}
-
-
-
-//NOTE: any instance timeouts will override this
-function setGlobalTimeout(value)
-{
-  Keystone.timeout = value;
-  Glance.timeout = value;
-  Neutron.timeout = value;
-  Nova.timeout = value;
 }
 
 
@@ -100,8 +95,7 @@ module.exports = {
   Glance: Glance,
   Keystone: Keystone,
   Neutron: Neutron,
+  Octavia: Octavia,
   Nova: Nova,
-  errors: errors,
-  getSimpleProject: getSimpleProject,
-  setGlobalTimeout: setGlobalTimeout
+  getSimpleProject: getSimpleProject
 }

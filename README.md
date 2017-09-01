@@ -1,5 +1,5 @@
 # Openstack-Wrapper
-A convenience wrapper for many of Openstack's common features with a focus on projects/tenants
+A convenience wrapper for many of Openstack's ecosystem of things
 
 ## Install
 
@@ -144,8 +144,8 @@ OSWrap.getSimpleProject('username', 'password', 'project_id', 'keystone_url', fu
 ### Keystone (aka Identity)
 * new Keystone(v3_public_url)
 * setTimeout(timeout_milliseconds)
-* setRequest(request_lib)
-* setMangler(mangler_lib)
+* setLogger(logger_obj)
+* setMangler(mangler_lib) --DEPRECATED
 * getToken(username, password, callback)
 * getProjectTokenById(generic_token_value, project_id, callback)
 * getProjectTokenByName(generic_token_value, domain_id, project_name, callback)
@@ -160,8 +160,8 @@ OSWrap.getSimpleProject('username', 'password', 'project_id', 'keystone_url', fu
 ### Nova (aka Compute)
 * new Nova(v2_public_url, project_token_value)
 * setTimeout(timeout_milliseconds)
-* setRequest(request_lib)
-* setMangler(mangler_lib)
+* setLogger(logger_obj)
+* setMangler(mangler_lib) --DEPRECATED
 * **Servers**
   * listServers(callback)
   * getServer(server_id, callback)
@@ -187,6 +187,7 @@ OSWrap.getSimpleProject('username', 'password', 'project_id', 'keystone_url', fu
   * getFlavor(flavor_id, callback)
 * **Floating Ips**
   * listFloatingIps(callback)
+  * listFloatingIps(options, callback)
   * getFloatingIp(floating_ip_id, callback)
   * createFloatingIp(data_object, callback)
   * removeFloatingIp(floating_ip_id, callback)
@@ -214,8 +215,7 @@ OSWrap.getSimpleProject('username', 'password', 'project_id', 'keystone_url', fu
 ### Glance (aka Image)
 * new Glance(v2_public_url, project_token_value)
 * setTimeout(timeout_milliseconds)
-* setRequest(request_lib)
-* setMangler(mangler_lib)
+* setMangler(mangler_lib) --DEPRECATED
 * listImages(callback)
 * getImage(image_id, callback)
 * queueImage(data_object, callback)
@@ -224,53 +224,76 @@ OSWrap.getSimpleProject('username', 'password', 'project_id', 'keystone_url', fu
 * removeImage(image_id, callback)
 
 ### Neutron (aka Network)
-* new Neutron(v2_public_url)
+* new Neutron(v2_public_url, project_token_value)
 * setTimeout(timeout_milliseconds)
-* setRequest(request_lib)
-* setMangler(mangler_lib)
+* setLogger(logger_obj)
+* setMangler(mangler_lib) --DEPRECATED
 * **Networks**
-* listNetworks(callback(error, array))
-* getNetwork(network_id, callback(error, obj))
+  * listNetworks(callback(error, array))
+  * getNetwork(network_id, callback(error, obj))
 * **Routers**
-* listRouters(callback(error, array))
-* getRouter(router_id, callback(error, obj))
+  * listRouters(callback(error, array))
+  * getRouter(router_id, callback(error, obj))
 * **FloatingIps**
-* createFloatingIp(floating_network_id, callback(error, obj))
-* listFloatingIps(callback(error, array))
-* getFloatingIp(ip_id, callback(error, obj))
-* updateFloatingIp(ip_id, port_id, callback(error, obj))
-* removeFloatingIp(ip_id, callback(error))
+  * createFloatingIp(floating_network_id, callback(error, obj))
+  * listFloatingIps(callback(error, array))
+  * getFloatingIp(ip_id, callback(error, obj))
+  * updateFloatingIp(ip_id, port_id, callback(error, obj))
+  * removeFloatingIp(ip_id, callback(error))
 * **Ports**
-* listPorts(callback(error, array))
-* getPort(port_id, callback(error, obj))
-* updatePort(port_id, data_object, callback(error, obj))
+  * listPorts(callback(error, array))
+  * listPorts(options, callback(error, array))
+  * getPort(port_id, callback(error, obj))
+  * updatePort(port_id, data_object, callback(error, obj))
 * **Security Groups**
-* createSecurityGroup(group_name, data_object, callback(error, obj))
-* listSecurityGroups(project_id, callback(error, array))
-* getSecurityGroup(group_id, callback(error, obj))
-* updateSecurityGroup(group_id, data_object, callback(error, obj))
-* removeSecurityGroup(group_id, callback(error))
+  * createSecurityGroup(group_name, data_object, callback(error, obj))
+  * listSecurityGroups(project_id, callback(error, array))
+  * getSecurityGroup(group_id, callback(error, obj))
+  * updateSecurityGroup(group_id, data_object, callback(error, obj))
+  * removeSecurityGroup(group_id, callback(error))
 * **SecurityGroupRules**
-* createSecurityGroupRule(group_id, data_object, callback(error, obj))
-* listSecurityGroupRules(callback(error, array))
-* getSecurityGroupRule(rule_id, callback(error, obj))
+  * createSecurityGroupRule(group_id, data_object, callback(error, obj))
+  * listSecurityGroupRules(callback(error, array))
+  * getSecurityGroupRule(rule_id, callback(error, obj))
 
-### Errors
-
-* **OpenStackError** -- All other errors extend this, so you can check instanceof OpenStackError
-##### Note: As of version 1.4.0 this is depreciated, and will be removed in 1.5.X
-	* BadRequestError (400)
-	* InvalidStateError (400)
-	* NotLoggedInError (401)
-	* ForbiddenError (403)
-	* NotFoundError (404)
-	* BadMethodError (405)
-	* LimitExceededError (413)
-	* BadMediaError (415)
-	* ValidationError (422)
-	* GenericError (500)
-	* NotImplementedError (501)
-	* UnavailableError (503)
+### Octavia (aka LoadBalancing)
+* new Octavia(v2_public_url, project_token_value)
+* setTimeout(timeout_milliseconds)
+* setRequestID(request_id)
+* setUserName(user_name)
+* setLogger(logger_obj)
+* setRetries(retries_on_locked)
+* setRetryDelay(delay_milliseconds)
+* **Load Balancers**
+  * createLoadBalancer(project_id, options_obj, cb(error, result_obj))
+  * listLoadBalancers(cb(error, result_array))
+  * getLoadBalancer(loadbalancer_id, cb(error, result_obj))
+  * updateLoadBalancer(loadbalancer_id, options_obj, result_obj))
+  * removeLoadBalancer(loadbalancer_id, cb(error))
+* **LB Listeners**
+  * createLBListener(loadbalancer_id, protocol, options_obj, cb(error, result_obj))
+  * listLBListeners(cb(error, result_array))
+  * getLBListener(listener_id, cb(error, result_obj))
+  * updateLBListener(listener_id, options_obj, cb(error, result_obj))
+  * removeLBListener(listener_id, cb(error))
+* **LB Pools**
+  * createLBPool(protocol, lb_algorithm, options_obj, cb(error, result_obj))
+  * listLBPools(cb(error, result_array))
+  * getLBPool(pool_id, cb(error, result_obj))
+  * updateLBPool(pool_id, options_obj, cb(error, result_obj))
+  * removeLBPool(pool_id, cb(error))
+* **LB Health Monitors**
+  * createLBHealthMonitor(pool_id, type, delay, timeout, max_retries, options_obj, cb(error, result_obj))
+  * listLBHealthMonitors(cb(error, result_array))
+  * getLBHealthMonitor(health_monitor_id, cb(error, result_obj))
+  * updateLBHealthMonitor(health_monitor_id, options_obj, cb(error, result_obj))
+  * removeLBHealthMonitor(health_monitor_id, cb(error))
+* **LB Pool Members**
+  * createLBPoolMember(pool_id, address, protocol_port, options_obj, cb(error, result_obj))
+  * listLBPoolMembers(pool_id, cb(error, result_array))
+  * getLBPoolMember(pool_id, member_id, cb(error, result_obj))
+  * updateLBPoolMember(pool_id, member_id, options_obj, cb(error, result_obj))
+  * removeLBPoolMember(pool_id, member_id, cb(error))
 
 
 ## Running Tests
@@ -284,6 +307,17 @@ npm test
 ```
 
 ## Change Log
+### 2.1.0
+
+* Added Octavia calls for LoadBalancers, Listeners, Pools, HealthChecks, and Members
+* Mangling is now Deprecated and not available in any new methods (like the Octavia ones) because 1-way mangling was a bad idea 2-way is better implemented in-app
+
+### 2.0.0
+
+* Added support for a logger object instead of replacing entire request object to faciliate remote call logging.
+* Removed multiple error types.  All methods now return a general error with a 'detail' property containing call details if a call was made
+* Removed global timeout feature (too confusing when that was/wasn't in play)
+
 ### 1.4.0
 	
 * Removed usage of OpenStackErrors. Specifically removed all references of isError() & getError() in favor of: isRequestError() & getRequestError().
